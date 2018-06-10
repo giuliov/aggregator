@@ -79,7 +79,18 @@ namespace Aggregator.Core.Implementations
             return int.Parse(rel.Url.Substring(1 + rel.Url.LastIndexOf('/')));
         }
 
-        public IEnumerable<IWorkItemExposed> Children => throw new NotImplementedException();
+        public IEnumerable<IWorkItemExposed> Children
+        {
+            get
+            {
+                foreach (var rel in current.Relations.Where(r => r.Rel == "System.LinkTypes.Hierarchy-Forward"))
+                {
+                    int childId = ParseIdFromUrl(rel);
+                    var t = witClient.GetWorkItemAsync(childId, expand: WorkItemExpand.All, userState: context);
+                    yield return new WorkItemExposed(t.Result, witClient, context);
+                }
+            }
+        }
 
         public IWorkItemLinkExposedCollection WorkItemLinks => throw new NotImplementedException();
 

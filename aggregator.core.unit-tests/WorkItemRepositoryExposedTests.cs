@@ -48,18 +48,5 @@ namespace Aggregator.Core.UnitTests
             Assert.Equal(-1, wi.Id);
             Assert.Equal("mytype", wi.TypeName);
         }
-
-        [Fact]
-        void GetWorkItem_ThenParent_Succeeds()
-        {
-            var context = new StubRequestContext();
-            var sut = new WorkItemRepositoryExposed(context);
-
-            var wi = sut.GetWorkItem(42);
-            var parentWi = wi.Parent;
-
-            Assert.NotNull(parentWi);
-            Assert.Equal(33, parentWi.Id);
-        }
     }
 }

@@ -55,6 +55,16 @@ namespace Aggregator.Core.UnitTests.Stubs
                     {
                         Rel = "System.LinkTypes.Hierarchy-Reverse",
                         Url = $"https://example.visualstudio.com/{context.ProjectName}/_apis/wit/workItems/33"
+                    },
+                    new WorkItemRelation
+                    {
+                        Rel = "System.LinkTypes.Hierarchy-Forward",
+                        Url = $"https://example.visualstudio.com/{context.ProjectName}/_apis/wit/workItems/77"
+                    },
+                    new WorkItemRelation
+                    {
+                        Rel = "System.LinkTypes.Hierarchy-Forward",
+                        Url = $"https://example.visualstudio.com/{context.ProjectName}/_apis/wit/workItems/78"
                     }
                 }
             });
