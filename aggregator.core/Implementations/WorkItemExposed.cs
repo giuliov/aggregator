@@ -11,12 +11,14 @@ namespace Aggregator.Core.Implementations
     {
         private WorkItem current;
         private readonly WorkItemTrackingHttpClientBase witClient;
+        private RequestContextBase context;
         private FieldsChangeLog changeLog;
 
-        public WorkItemExposed(WorkItem original, WorkItemTrackingHttpClientBase witClient)
+        public WorkItemExposed(WorkItem original, WorkItemTrackingHttpClientBase witClient, RequestContextBase context)
         {
             this.current = original ?? throw new ArgumentNullException(nameof(original));
             this.witClient = witClient ?? throw new ArgumentNullException(nameof(witClient));
+            this.context = context;
             changeLog = new FieldsChangeLog()
             {
                 WorkItemId = original.Id.GetValueOrDefault(0),
@@ -64,15 +66,17 @@ namespace Aggregator.Core.Implementations
         {
             get
             {
-                var wiql = new Wiql() {
-                    Query = "TODO"
-                };
-                Guid project;
-                var result = witClient.QueryByWiqlAsync(wiql, project);
-                int parentId = result.Result.WorkItems.FirstOrDefault().Id;
-                var t = witClient.GetWorkItemAsync(parentId);
-                return new WorkItemExposed(t.Result, witClient);
+                var rel = current.Relations.Where(r => r.Rel == "System.LinkTypes.Hierarchy-Reverse").FirstOrDefault();
+                int parentId = ParseIdFromUrl(rel);
+                var t = witClient.GetWorkItemAsync(parentId, expand: WorkItemExpand.All, userState: context);
+                return new WorkItemExposed(t.Result, witClient, context);
             }
+        }
+
+        private static int ParseIdFromUrl(WorkItemRelation rel)
+        {
+            //HACK
+            return int.Parse(rel.Url.Substring(1 + rel.Url.LastIndexOf('/')));
         }
 
         public IEnumerable<IWorkItemExposed> Children => throw new NotImplementedException();

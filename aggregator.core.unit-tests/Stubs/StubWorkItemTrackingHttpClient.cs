@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Aggregator.Core
+namespace Aggregator.Core.UnitTests.Stubs
 {
     internal class StubWorkItemTrackingHttpClient : WorkItemTrackingHttpClientBase
     {
@@ -21,6 +21,24 @@ namespace Aggregator.Core
 
         public override Task<WorkItem> GetWorkItemAsync(int id, IEnumerable<string> fields = null, DateTime? asOf = null, WorkItemExpand? expand = null, object userState = null, CancellationToken cancellationToken = default(CancellationToken))
         {
+            if (expand == null)
+            {
+                throw new ArgumentNullException(nameof(expand));
+            }
+            if (expand != WorkItemExpand.All)
+            {
+                throw new ArgumentException("Must be WorkItemExpand.All", nameof(expand));
+            }
+            if (userState == null)
+            {
+                throw new ArgumentNullException(nameof(userState));
+            }
+            if (!(userState is RequestContextBase))
+            {
+                throw new ArgumentException("Must derive from {nameof(RequestContextBase)}", nameof(userState));
+            }
+            var context = userState as RequestContextBase;
+
             var t = new Task<WorkItem>(() => new WorkItem()
             {
                 Id = id,
@@ -30,7 +48,15 @@ namespace Aggregator.Core
                     { "System.State", "Open" },
                     { "System.TeamProject", "MyProject" }
                 },
-                Rev = 99
+                Rev = 99,
+                Relations = new List<WorkItemRelation>()
+                {
+                    new WorkItemRelation
+                    {
+                        Rel = "System.LinkTypes.Hierarchy-Reverse",
+                        Url = $"https://example.visualstudio.com/{context.ProjectName}/_apis/wit/workItems/33"
+                    }
+                }
             });
             t.RunSynchronously();
             return t;

@@ -4,6 +4,7 @@ using System.Text;
 using Xunit;
 using Aggregator.Core.Implementations;
 using Aggregator.Core;
+using Aggregator.Core.UnitTests.Stubs;
 
 namespace Aggregator.Core.UnitTests
 {
@@ -12,8 +13,8 @@ namespace Aggregator.Core.UnitTests
         [Fact]
         void GetWorkItem_ById_Succeeds()
         {
-            var witClient = new StubWorkItemTrackingHttpClient(null, null);
-            var sut = new WorkItemRepositoryExposed(witClient);
+            var context = new StubRequestContext();
+            var sut = new WorkItemRepositoryExposed(context);
 
             var wi = sut.GetWorkItem(42);
 
@@ -24,35 +25,35 @@ namespace Aggregator.Core.UnitTests
         [Fact]
         void MakeNewWorkItem_UsingProjectName_Succeeds()
         {
-            var witClient = new StubWorkItemTrackingHttpClient(null, null);
-            var sut = new WorkItemRepositoryExposed(witClient);
+            var context = new StubRequestContext();
+            var sut = new WorkItemRepositoryExposed(context);
 
             var wi = sut.MakeNewWorkItem("myproject", "mytype");
 
             Assert.NotNull(wi);
-            Assert.Equal(0, wi.Id);
+            Assert.Equal(-1, wi.Id);
             Assert.Equal("mytype", wi.TypeName);
         }
 
         [Fact]
         void MakeNewWorkItem_UsingSample_Succeeds()
         {
-            var witClient = new StubWorkItemTrackingHttpClient(null, null);
-            var sut = new WorkItemRepositoryExposed(witClient);
+            var context = new StubRequestContext();
+            var sut = new WorkItemRepositoryExposed(context);
 
             var sampleWi = sut.GetWorkItem(42);
             var wi = sut.MakeNewWorkItem(sampleWi, "mytype");
 
             Assert.NotNull(wi);
-            Assert.Equal(0, wi.Id);
+            Assert.Equal(-1, wi.Id);
             Assert.Equal("mytype", wi.TypeName);
         }
 
         [Fact]
         void GetWorkItem_ThenParent_Succeeds()
         {
-            var witClient = new StubWorkItemTrackingHttpClient(null, null);
-            var sut = new WorkItemRepositoryExposed(witClient);
+            var context = new StubRequestContext();
+            var sut = new WorkItemRepositoryExposed(context);
 
             var wi = sut.GetWorkItem(42);
             var parentWi = wi.Parent;

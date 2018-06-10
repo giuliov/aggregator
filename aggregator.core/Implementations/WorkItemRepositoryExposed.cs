@@ -1,5 +1,6 @@
 ﻿using Aggregator.Core.Interfaces;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
+using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -9,19 +10,21 @@ namespace Aggregator.Core.Implementations
     public class WorkItemRepositoryExposed : IWorkItemRepositoryExposed
     {
         private WorkItemTrackingHttpClientBase witClient;
+        private RequestContextBase context;
 
-        public WorkItemRepositoryExposed(WorkItemTrackingHttpClientBase witClient)
+        public WorkItemRepositoryExposed(RequestContextBase context)
         {
-            this.witClient = witClient;
+            this.context = context;
+            this.witClient = context.WitClient;
         }
 
         public IWorkItemExposed GetWorkItem(int workItemId)
         {
-            var t = witClient.GetWorkItemAsync(workItemId);
+            var t = witClient.GetWorkItemAsync(workItemId, expand: WorkItemExpand.All, userState: context);
             t.Wait();
             if (t.IsCompletedSuccessfully)
             {
-                return new WorkItemExposed(t.Result, witClient);
+                return new WorkItemExposed(t.Result, witClient, context);
             }
             else
             {
@@ -37,13 +40,16 @@ namespace Aggregator.Core.Implementations
 
         public IWorkItemExposed MakeNewWorkItem(string projectName, string workItemTypeName)
         {
-            var wi = new Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models.WorkItem();
-            wi.Fields = new Dictionary<string, object>()
+            var wi = new WorkItem
+            {
+                Id = -1,
+                Fields = new Dictionary<string, object>()
             {
                 { "System.TeamProject", projectName },
                 { "System.WorkItemType", workItemTypeName}
+            }
             };
-            return new WorkItemExposed(wi, witClient);
+            return new WorkItemExposed(wi, witClient, context);
         }
 
         public void AddItemToGlobalList(string globalListName, string item)
