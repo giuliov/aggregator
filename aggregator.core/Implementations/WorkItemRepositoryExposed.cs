@@ -40,6 +40,9 @@ namespace Aggregator.Core.Implementations
 
         public IWorkItemExposed MakeNewWorkItem(string projectName, string workItemTypeName)
         {
+            // HACK
+            // should be a call to get the WI Type structure
+            // and then initialize
             var wi = new WorkItem
             {
                 Id = -1,
@@ -50,21 +53,6 @@ namespace Aggregator.Core.Implementations
             }
             };
             return new WorkItemExposed(wi, witClient, context);
-        }
-
-        public void AddItemToGlobalList(string globalListName, string item)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<string> GetGlobalList(string globalListName)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void RemoveItemFromGlobalList(string globalListName, string item)
-        {
-            throw new NotImplementedException();
         }
     }
 }

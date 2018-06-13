@@ -13,10 +13,13 @@ namespace Aggregator.Core.Interfaces
 
         IWorkItemExposed MakeNewWorkItem(IWorkItemExposed inSameProjectAs, string workItemTypeName);
 
+        /* More features not available through REST API
+
         IEnumerable<string> GetGlobalList(string globalListName);
 
         void AddItemToGlobalList(string globalListName, string item);
 
         void RemoveItemFromGlobalList(string globalListName, string item);
+        */
     }
 }
