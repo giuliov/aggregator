@@ -16,7 +16,8 @@ namespace Aggregator.Core.Interfaces
 
         int Revision { get; }
 
-        IRevision LastRevision { get; }
+        // HACK break compatibility: this method is useless
+        // IRevision LastRevision { get; }
 
         IRevision PreviousRevision
         {

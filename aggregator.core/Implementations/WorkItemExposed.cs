@@ -48,9 +48,10 @@ namespace Aggregator.Core.Implementations
 
         public DateTime RevisedDate => throw new NotImplementedException();
 
-        public int Revision => throw new NotImplementedException();
+        public int Revision => (int)current.Fields["System.Rev"];
 
-        public IRevision LastRevision => throw new NotImplementedException();
+        // HACK break compatibility: this method is useless
+        // public IRevision LastRevision => throw new NotImplementedException();
 
         public IRevision PreviousRevision => throw new NotImplementedException();
 
